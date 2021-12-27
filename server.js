@@ -8,25 +8,42 @@ const { v4: uuidv4 } = require('uuid');
 const router = new Router();
 const app = new Koa();
 
-const objectMessages = {
+const posts = {
     status: 'ok',
-    timestamp: new Date().getTime(),
-    messages: [],
+    data: [],
+}
+const comments = {
+    status: 'ok',
+    data: [],
 }
 
-function generationMessage(array) {
-    const timer = Math.random() * 1000000;
-    setTimeout(() => {
-        array.push({
-            id: uuidv4(),
-            from: faker.internet.email(),
-            subject: `Hello from ${faker.name.findName()}`,
-            body: faker.lorem.words(5),
-            received: faker.time.recent(),
+function generationPosts(posts, comments) {
+    for (let i = 0; i < 10; i++) {
+        const id = uuidv4();
+        posts.push({
+            id: id,
+            author_id: faker.internet.email(),
+            title: faker.name.title(),
+            author: faker.internet.userName(),
+            avatar: faker.internet.avatar(),
+            image: faker.image.avatar(),
+            created: faker.time.recent(),
         })
-    }, timer);
-    console.log(timer);
+        for (let i = 0; i < 3; i++) {
+            comments.push({
+                id: uuidv4(),
+                post_id: id,
+                author_id: faker.internet.email(),
+                author: faker.internet.userName(),
+                avatar: faker.internet.avatar(),
+                content: faker.lorem.text(1),
+                created: faker.time.recent(),
+            })
+        }
+    }
 }
+
+generationPosts(posts.data, comments.data);
 
 app.use(koaBody({
     text: true,
@@ -42,11 +59,15 @@ app.use(cors({
     allowMethods: ['GET']
 }));
 
-router.get('/messages/unread', async (ctx) => {
-    generationMessage(objectMessages.messages);
-    console.log(objectMessages.messages);
-    ctx.response.body = objectMessages;
-    ctx.status = 200;
+router.get('/posts', async (ctx) => {
+
+    if (ctx.request.query.posts === 'latest') {
+        ctx.status = 200;
+        ctx.response.body = posts.data;
+    } else {
+        const comm = comments.data.filter((elem) => ctx.request.query.post_id === elem.post_id);
+        ctx.response.body = comm;
+    }
 });
 
 app.use(router.routes()).use(router.allowedMethods());
