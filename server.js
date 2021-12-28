@@ -18,24 +18,24 @@ const comments = {
 }
 
 function generationPosts(posts, comments) {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
         const id = uuidv4();
         posts.push({
             id: id,
             author_id: faker.internet.email(),
             title: faker.name.title(),
             author: faker.internet.userName(),
-            avatar: faker.internet.avatar(),
-            image: faker.image.avatar(),
+            avatar: faker.image.people(),
+            image: faker.image.image(),
             created: faker.time.recent(),
         })
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 10; i++) {
             comments.push({
                 id: uuidv4(),
                 post_id: id,
                 author_id: faker.internet.email(),
                 author: faker.internet.userName(),
-                avatar: faker.internet.avatar(),
+                avatar: faker.image.cats(),
                 content: faker.lorem.text(1),
                 created: faker.time.recent(),
             })
